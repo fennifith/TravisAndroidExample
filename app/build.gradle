@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.github.triplet.play'
 
 android {
     compileSdkVersion 27
@@ -25,18 +24,26 @@ android {
     }
 
     def isRunningOnTravis = System.getenv("CI") == "true"
-
     if (isRunningOnTravis) {
-        // configure keystore
-        signingConfigs.release.storeFile = file("../OurStore.keystore")
+        signingConfigs.release.storeFile = file("../key.jks")
         signingConfigs.release.storePassword = System.getenv("keystore_password")
         signingConfigs.release.keyAlias = System.getenv("keystore_alias")
         signingConfigs.release.keyPassword = System.getenv("keystore_alias_password")
     }
 }
 
+task printVersionName {
+	doLast {
+		println android.defaultConfig.versionName
+	}
+}
+
+play {
+	serviceAccountCredentials = file("../service.json")
+	track = "alpha"
+}
+
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
